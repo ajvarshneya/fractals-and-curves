@@ -1,3 +1,4 @@
+#
 # dragon.py
 #
 # A.J. Varshneya
@@ -34,7 +35,7 @@ def draw_dragon_x(draw, start, depth, angle):
 	if depth >= MAX_DEPTH: return (start, angle)
 	depth += 1
 	
-	# Recursive pattern
+	# Recursive pattern (based on L-system)
 	(start, angle) = draw_dragon_x(draw, start, depth, angle)
 	angle += TURN_ANGLE
 	(start, angle) = draw_dragon_y(draw, start, depth, angle)
@@ -48,7 +49,7 @@ def draw_dragon_y(draw, start, depth, angle):
 	if depth >= MAX_DEPTH: return (start, angle)
 	depth += 1
 	
-	# Recursive pattern
+	# Recursive pattern (based on L-system)
 	angle -= TURN_ANGLE
 	start = draw_forward(draw, start, angle, LINE_LENGTH, LINE_COLOR)
 	(start, angle) = draw_dragon_x(draw, start, depth, angle)
