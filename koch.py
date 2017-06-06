@@ -1,3 +1,4 @@
+#
 # koch.py
 #
 # A.J. Varshneya
