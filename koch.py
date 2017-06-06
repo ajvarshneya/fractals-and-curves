@@ -1,135 +1,70 @@
+# koch.py
+#
+# A.J. Varshneya
+# ajvarshneya@gmail.com
+#
+# Python implementation of koch snowflake fractal.
+#
+
 import os
 import random
 import math
-import heapq
 from PIL import Image, ImageFont, ImageDraw
 
-LENGTH = 1
+from utilities import *
+from draw_lines import *
+
+# Constants
+CANVAS_WIDTH = 2048
+CANVAS_HEIGHT = 2048
+
+START_POINT = (500, 800)
+START_ANGLE = 0
+START_DEPTH = 0
+
 MAX_DEPTH = 7
+LINE_LENGTH = 1
+LINE_COLOR = (0, 255, 0, 255)
 TURN_ANGLE = math.radians(60)
 
-# These functions do math with tuples
-def tuple_add(tuple1, tuple2):
-	add = lambda x,y: x + y
-	return map(add, tuple1, tuple2)
+OUTFILE = "koch.png"
 
-def tuple_sub(tuple1, tuple2):
-	sub = lambda x,y: x - y
-	return map(sub, tuple1, tuple2)
-
-def tuple_mul(tuple1, scale):
-	mul = lambda x: x * scale
-	return map(mul, tuple1)
-
-def tuple_div(tuple1, scale):
-	div = lambda x: x / scale
-	return map(div, tuple1)
-
-# Implements algorithm based on digital differential analyzer algorithm
-def dda_line(point1, point2):
-	# List of pixels that will be built 
-	line_pixels = []
-	
-	# Line to same point
-	if point1 == point2: return []
-	
-	# Compute difference in pixels
-	point_diff = tuple_sub(point2, point1)
-	
-	# Step in columns or rows
-	if abs(point_diff[0]) > abs(point_diff[1]): i = 0
-	else: i = 1
-
-	# Difference in step is negative, swap points to make it positive
-	if point_diff[i] < 0:
-		point1, point2 = point2, point1
-
-		point_diff = tuple_mul(point_diff, -1)
-
-	slope = tuple_div(point_diff, point_diff[i])
-
-	# To get first pixel on line
-	init_diff = math.ceil(point1[i]) - point1[i]
-	init_slope = tuple_mul(slope, init_diff)
-
-	current_point = tuple_add(point1, init_slope)
-
-	# Scan
-	while (current_point[i] < point2[i]):	
-		# Pixels stored as floats, rounding done when drawing
-		point_to_draw = (int(current_point[0] + 0.5), int(current_point[1] + 0.5))
-		line_pixels.append(point_to_draw)
-		
-		# Compute next pixel
-		current_point = tuple_add(current_point, slope)
-
-	return line_pixels
-
+# Draws one edge of a koch snowflake
 def draw_koch(draw, start, depth, angle):
 	if depth >= MAX_DEPTH: return (start, angle)
 	depth += 1
-
-	start = draw_forward(draw, start, LENGTH, angle)
-
+	
+	# Koch pattern
+	start = draw_forward(draw, start, angle, LINE_LENGTH, LINE_COLOR)
 	(start, angle) = draw_koch(draw, start, depth, angle)
-
-	# Turn left
 	angle -= TURN_ANGLE
 	(start, angle) = draw_koch(draw, start, depth, angle)
-
-	# Turn right
 	angle += TURN_ANGLE
 	angle += TURN_ANGLE
-
 	(start, angle) = draw_koch(draw, start, depth, angle)
-	
-	# Turn left
 	angle -= TURN_ANGLE
 	(start, angle) = draw_koch(draw, start, depth, angle)
 
 	return (start, angle)
 
-def draw_forward(draw, start, length, angle):
-	# print "start " + str(start)
-	end = (start[0] + length * math.cos(angle), 
-		   start[1] + length * math.sin(angle))
-
-	pixels = dda_line(start, end)
-	for pixel in pixels:
-		draw.point(pixel, (0, 255, 0, 255))
-		
-	# print "end " + str(end)
-	return end
-
 def main():
-	# Canvas dimensions
-	width = 2048
-	height = 2048
-
-	# Scale
-	zoom = 64
-
-	pixels = []
-	heap = []
-
 	# Setup canvas
 	dir_path = os.path.dirname(os.path.abspath(__file__))
 	im = Image.new("RGB", (width, height))
 	draw = ImageDraw.Draw(im)
+	
+	# Draw the snowflake
+	(start, angle) = draw_koch(draw, START_POINT, START_DEPTH, START_ANGLE)
+	angle += TURN_ANGLE
+	angle += TURN_ANGLE
+	(start, angle) = draw_koch(draw, start, START_DEPTH, angle)
+	angle += TURN_ANGLE
+	angle += TURN_ANGLE
+	(start, angle) = draw_koch(draw, start, START_DEPTH, angle)
 
-	start = (500, 800)
-	depth = 0
-	angle = 0
-
-	(start, angle) = draw_koch(draw, start, depth, angle)
-	angle += TURN_ANGLE
-	angle += TURN_ANGLE
-	(start, angle) = draw_koch(draw, start, depth, angle)
-	angle += TURN_ANGLE
-	angle += TURN_ANGLE
-	(start, angle) = draw_koch(draw, start, depth, angle)
-
-	im.save(dir_path + os.sep + "koch.png")
+	im.save(dir_path + os.sep + OUTFILE)
 
 if __name__ == "__main__":
 	main()
+
+
