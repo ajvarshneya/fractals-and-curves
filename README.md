@@ -1,1 +1,1 @@
-I wrote some scripts to draw neat stuff using PIL.
+Draws fractals with PIL.
