@@ -64,5 +64,16 @@ def draw_forward(draw, start, angle, length, color):
 		
 	return end
 
+def draw_square(draw, start, size, color):
+	pixels = []
+	for length in range(size):
+		line_start = (start[0], start[1] + length)
+		line_end = (start[0] + size, start[1] + length)
+		pixels += dda_line(line_start, line_end)
 
-
+	for pixel in pixels:
+		draw.point(pixel, color)
+	
+	distance = size - 1 if size else 0
+	end = (start[0] + distance, start[1] + distance)
+	return end
